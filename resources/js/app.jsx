@@ -25,10 +25,10 @@ function SelectLang({ value, onChange }) {
 function Translate() {
     const [sourceCode, setSourceCode] = useState("");
     const [resultCode, setResultCode] = useState("");
-    const [sourceLang, setSourceLang] = useState("");
-    const [targetLang, setTargetLang] = useState("");
+    const [sourceLang, setSourceLang] = useState("php");
+    const [targetLang, setTargetLang] = useState("php");
     const click = async () => {
-        if (!sourceLang || !targetLang) {
+        if (!sourceLang || !targetLang || sourceLang === targetLang) {
             alert("Please select languages");
             return;
         }
@@ -44,32 +44,37 @@ function Translate() {
             }),
         });
         const data = await res.json();
-        setResultCode(data.value);
+        setResultCode(data.result);
     };
     return (
-        <div className="">
-            <button
-                className="mt-4 rounded-full bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-                onClick={click}
-            >
-                TRANSLATE
-            </button>
+        <div className="max-w-4xl mx-auto p-6">
+            <div className="flex justify-between items-center">
+                <p className="font-bold text-3xl">TRANSLATE_SYNTAX</p>
+                <button
+                    className="mt-4 rounded-full bg-blue-500 px-9 py-3 text-white hover:bg-blue-600"
+                    onClick={click}
+                >
+                    TRANSLATE
+                </button>
+            </div>
 
-            <div>
-                <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div className="flex flex-col gap-2">
+                    <p className="font-bold text-lg">SOURCE_CODE</p>
                     <SelectLang value={sourceLang} onChange={setSourceLang} />
                     <textarea
-                        className="min-w-100 rounded-3xl border border-gray-200"
+                        className="min-w-100 min-h-150 rounded-xl border border-gray-200 p-5"
                         value={sourceCode}
                         onChange={(e) => setSourceCode(e.target.value)}
                         placeholder="Paste function here..."
                     />
                 </div>
 
-                <div>
+                <div className="flex flex-col gap-2">
+                    <p className="font-bold text-lg">TRANSLATED_CODE</p>
                     <SelectLang value={targetLang} onChange={setTargetLang} />
                     <textarea
-                        className="min-w-100 rounded-3xl border border-gray-200"
+                        className="min-w-100 min-h-150 rounded-xl border border-gray-200 p-5"
                         value={resultCode}
                         readOnly
                     />
