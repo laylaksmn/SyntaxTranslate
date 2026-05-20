@@ -23,24 +23,28 @@ function SelectLang({ value, onChange }) {
 }
 
 function Translate() {
-    const [val, setVal] = useState("");
-    const [result, setResult] = useState("");
-    const [sourceLang, setSourceLang] = useState("PHP");
-    const [targetLang, setTargetLang] = useState("Python");
+    const [sourceCode, setSourceCode] = useState("");
+    const [resultCode, setResultCode] = useState("");
+    const [sourceLang, setSourceLang] = useState("");
+    const [targetLang, setTargetLang] = useState("");
     const click = async () => {
+        if (!sourceLang || !targetLang) {
+            alert("Please select languages");
+            return;
+        }
         const res = await fetch("/api/translate", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                code: val,
+                code: sourceCode,
                 source_code_lang: sourceLang,
                 selected_lang: targetLang,
             }),
         });
         const data = await res.json();
-        setResult(data.result);
+        setResultCode(data.value);
     };
     return (
         <div className="">
@@ -54,19 +58,19 @@ function Translate() {
             <div>
                 <div>
                     <SelectLang value={sourceLang} onChange={setSourceLang} />
-                    <input
+                    <textarea
                         className="min-w-100 rounded-3xl border border-gray-200"
-                        value={val}
-                        onChange={(e) => setVal(e.target.value)}
+                        value={sourceCode}
+                        onChange={(e) => setSourceCode(e.target.value)}
                         placeholder="Paste function here..."
                     />
                 </div>
 
                 <div>
                     <SelectLang value={targetLang} onChange={setTargetLang} />
-                    <input
+                    <textarea
                         className="min-w-100 rounded-3xl border border-gray-200"
-                        value={result}
+                        value={resultCode}
                         readOnly
                     />
                 </div>

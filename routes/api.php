@@ -36,7 +36,7 @@ Route::post('/translate', function (Request $request) {
     $raw = $response->json();
     if (!isset($raw['choices'][0]['message']['content'])) {
         return response()->json([
-            'error' => 'Cb lagi',
+            'error' => 'Please try again later',
         ], 500);
     }
     return response()->json([
