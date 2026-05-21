@@ -46,8 +46,49 @@ function Translate() {
         const data = await res.json();
         setResultCode(data.result);
     };
+
     return (
         <div className="max-w-4xl mx-auto p-6">
+            <div className="flex items-center gap-3">
+                <img src="images/logo.png" alt="Logo" className="w-8 h-8" />
+                <p className="font-bold text-3xl">SYNTAXTRANSLATE</p>
+            </div>
+
+            <div></div>
+            <div className="w-xs p-12 flex flex-col gap-5">
+                <p className="font-bold text-2xl">WORKSPACE</p>
+                <nav className="flex items-center gap-3 rounded-full bg-blue-500 text-white px-4 py-2">
+                    <img
+                        src="images/translate-icon-active.png"
+                        alt="icon"
+                        className="w-5 h-5 m-2"
+                    />
+                    <a href="#" className="">
+                        TRANSLATE
+                    </a>
+                </nav>
+                <nav className="flex items-center gap-3 px-4 py-2">
+                    <img
+                        src="images/compare-icon.png"
+                        alt="icon"
+                        className="w-5 h-5 m-2"
+                    />
+                    <a href="#" className="hover:">
+                        COMPARE
+                    </a>
+                </nav>
+                <nav className="flex items-center gap-3 px-4 py-2">
+                    <img
+                        src="images/beautify-icon.png"
+                        alt="icon"
+                        className="w-5 h-5 m-2"
+                    />
+                    <a href="#" className="hover:">
+                        BEAUTIFY
+                    </a>
+                </nav>
+            </div>
+
             <div className="flex justify-between items-center">
                 <p className="font-bold text-3xl">TRANSLATE_SYNTAX</p>
                 <button
