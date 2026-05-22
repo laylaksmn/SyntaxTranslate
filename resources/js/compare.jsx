@@ -39,3 +39,6 @@ function Compare() {
         </div>
     );
 }
+
+const root = createRoot(document.getElementById("app"));
+root.render(<Compare />);

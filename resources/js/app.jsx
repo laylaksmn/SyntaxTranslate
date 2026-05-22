@@ -9,7 +9,7 @@ const languages = [
 function SelectLang({ value, onChange }) {
     return (
         <select
-            className="rounded-full border border-gray-200 px-3 py-2"
+            className="rounded-full border border-gray-200 px-3 py-2 cursor-pointer"
             value={value}
             onChange={(e) => onChange(e.target.value)}
         >
@@ -20,6 +20,10 @@ function SelectLang({ value, onChange }) {
             ))}
         </select>
     );
+}
+
+async function Copy(code) {
+    await navigator.clipboard.writeText(code);
 }
 
 function Translate() {
@@ -95,7 +99,7 @@ function Translate() {
                     <div className="flex justify-between items-center mb-8">
                         <p className="font-bold text-3xl">TRANSLATE_SYNTAX</p>
                         <button
-                            className="rounded-full bg-blue-500 px-9 py-3 text-white hover:bg-blue-600"
+                            className="rounded-full bg-blue-500 px-9 py-3 text-white hover:bg-blue-600 active:bg-blue-800 cursor-pointer"
                             onClick={click}
                         >
                             TRANSLATE
@@ -124,10 +128,22 @@ function Translate() {
                                 <p className="font-bold text-xl">
                                     TRANSLATED_CODE
                                 </p>
-                                <SelectLang
-                                    value={targetLang}
-                                    onChange={setTargetLang}
-                                />
+                                <div className="flex items-center gap-3">
+                                    <SelectLang
+                                        value={targetLang}
+                                        onChange={setTargetLang}
+                                    />
+                                    <button
+                                        className="rounded-full hover:bg-gray-200 active:scale-95 transition-transform duration-200 cursor-pointer"
+                                        onClick={() => Copy(resultCode)}
+                                    >
+                                        <img
+                                            src="images/copy-icon.png"
+                                            alt="copy"
+                                            className="w-5 h-5 m-2"
+                                        />
+                                    </button>
+                                </div>
                             </div>
                             <textarea
                                 className="font-semibold text-lg w-full min-h-150 bg-white rounded-b-3xl border-t-1 border-gray-200 p-5"
