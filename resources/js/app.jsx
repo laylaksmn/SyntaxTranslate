@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Code2, ArrowLeftRight, Library, Trash2, Copy, Download, Share2, Play, ChevronDown, Languages } from 'lucide-react';
+import { Code2, ArrowLeftRight, Wand2, Trash2, Copy, Download, Share2, Play, ChevronDown, Languages } from 'lucide-react';
 import "../css/app.css";
 
 const languages = [
@@ -88,7 +88,7 @@ const App = () => {
                                     <span className="text-[13px] tracking-wide">COMPARE</span>
                                 </a>
                                 <a href="/beautify" className="flex items-center gap-4 text-slate-500 hover:bg-slate-50 px-5 py-3.5 rounded-[1.25rem] font-bold transition-all hover:text-slate-800">
-                                    <Library size={22} />
+                                    <Wand2 size={22} />
                                     <span className="text-[13px] tracking-wide">BEAUTIFY</span>
                                 </a>
                             </nav>
