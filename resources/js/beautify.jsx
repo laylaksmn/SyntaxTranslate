@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Code2, ArrowLeftRight, Wand2, Languages, X, Copy } from 'lucide-react';
+import { Code2, ArrowLeftRight, Wand2, Languages, X, Copy, ChevronDown } from 'lucide-react';
 import { Editor } from "@monaco-editor/react";
 import "../css/app.css";
+
+const LANGUAGES = [
+    { label: 'PHP', value: 'php', monaco: 'php' },
+    { label: 'Python', value: 'python', monaco: 'python' },
+];
 
 const Beautify = () => {
     const [sourceCode, setSourceCode] = useState("");
     const [resultCode, setResultCode] = useState("");
+    const [selectedLang, setSelectedLang] = useState(LANGUAGES[0]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [langOpen, setLangOpen] = useState(false);
 
     const handleCopy = async (code) => {
         if (!code) return;
@@ -14,7 +23,9 @@ const Beautify = () => {
     };
 
     const handleBeautify = async () => {
-        // Minimal beautify feature using an API call if it exists, or just copy to output
+        if (!sourceCode.trim()) return;
+        setLoading(true);
+        setError("");
         try {
             const res = await fetch("/api/beautify", {
                 method: "POST",
@@ -23,17 +34,22 @@ const Beautify = () => {
                 },
                 body: JSON.stringify({
                     code: sourceCode,
-                    lang: "typescript"
+                    lang: selectedLang.value,
                 }),
             });
-            if(res.ok) {
+            if (res.ok) {
                 const data = await res.json();
                 setResultCode(data.result);
             } else {
-                setResultCode(sourceCode);
+                const data = await res.json().catch(() => ({}));
+                setError(data.error || "Something went wrong. Please try again.");
+                setResultCode("");
             }
-        } catch(e) {
-            setResultCode(sourceCode);
+        } catch (e) {
+            setError("Network error. Please try again.");
+            setResultCode("");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -85,12 +101,46 @@ const Beautify = () => {
                         <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase">BEAUTIFY</h1>
                         <button 
                             onClick={handleBeautify}
-                            className="flex items-center gap-2 bg-[#3b82f6] text-white px-8 py-3.5 rounded-full font-bold text-sm shadow-[0_8px_20px_-6px_rgba(59,130,246,0.6)] hover:bg-blue-600 transition-all active:scale-95 cursor-pointer"
+                            disabled={loading}
+                            className="flex items-center gap-2 bg-[#3b82f6] text-white px-8 py-3.5 rounded-full font-bold text-sm shadow-[0_8px_20px_-6px_rgba(59,130,246,0.6)] hover:bg-blue-600 transition-all active:scale-95 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            <ArrowLeftRight size={16} />
-                            RUN BEAUTIFY
+                            <Wand2 size={16} />
+                            {loading ? "PROCESSING..." : "RUN BEAUTIFY"}
                         </button>
                     </div>
+
+                    {/* Language Selector */}
+                    <div className="flex items-center gap-3 mb-5">
+                        <span className="text-xs font-bold text-slate-500 tracking-widest">LANGUAGE</span>
+                        <div className="relative">
+                            <button
+                                onClick={() => setLangOpen(!langOpen)}
+                                className="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-5 py-2 font-bold text-sm text-slate-800 shadow-sm hover:border-blue-400 transition-all"
+                            >
+                                {selectedLang.label}
+                                <ChevronDown size={14} className={`transition-transform ${langOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                            {langOpen && (
+                                <div className="absolute top-full left-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-lg z-20 overflow-hidden min-w-[120px]">
+                                    {LANGUAGES.map((lang) => (
+                                        <button
+                                            key={lang.value}
+                                            onClick={() => { setSelectedLang(lang); setLangOpen(false); }}
+                                            className={`w-full text-left px-5 py-3 text-sm font-bold transition-colors hover:bg-blue-50 hover:text-blue-600 ${selectedLang.value === lang.value ? 'text-blue-600 bg-blue-50' : 'text-slate-700'}`}
+                                        >
+                                            {lang.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {error && (
+                        <div className="mb-4 px-5 py-3 bg-red-50 border border-red-200 text-red-600 rounded-2xl text-sm font-semibold">
+                            {error}
+                        </div>
+                    )}
 
                     <div className="flex flex-1 gap-6">
                         
@@ -99,7 +149,7 @@ const Beautify = () => {
                             <div className="flex justify-between items-center mb-2 px-4 py-3 border-b border-slate-100">
                                 <span className="text-[13px] font-bold text-slate-800">SOURCE_CODE</span>
                                 <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-bold text-slate-500 border border-slate-200 rounded-full px-3 py-1">TYPESCRIPT</span>
+                                    <span className="text-[10px] font-bold text-slate-500 border border-slate-200 rounded-full px-3 py-1">{selectedLang.label.toUpperCase()}</span>
                                     <button onClick={() => setSourceCode("")} className="text-slate-400 hover:text-slate-800 transition-colors">
                                         <X size={16} />
                                     </button>
@@ -109,7 +159,7 @@ const Beautify = () => {
                             <div className="flex-1 py-2">
                                 <Editor
                                     height="100%"
-                                    defaultLanguage="typescript"
+                                    language={selectedLang.monaco}
                                     value={sourceCode}
                                     onChange={(value) => setSourceCode(value)}
                                     options={{
@@ -128,9 +178,9 @@ const Beautify = () => {
                         {/* Output Block */}
                         <div className="flex-1 bg-white rounded-[2rem] p-2 flex flex-col border border-slate-200/60 shadow-sm overflow-hidden min-h-[500px]">
                             <div className="flex justify-between items-center mb-2 px-4 py-3 border-b border-slate-100">
-                                <span className="text-[13px] font-bold text-slate-800">MODIFIED_CODE</span>
+                                <span className="text-[13px] font-bold text-slate-800">BEAUTIFIED_CODE</span>
                                 <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-bold text-slate-500 border border-slate-200 rounded-full px-3 py-1">TYPESCRIPT</span>
+                                    <span className="text-[10px] font-bold text-slate-500 border border-slate-200 rounded-full px-3 py-1">{selectedLang.label.toUpperCase()}</span>
                                     <button onClick={() => handleCopy(resultCode)} className="text-slate-400 hover:text-slate-800 transition-colors">
                                         <Copy size={16} />
                                     </button>
@@ -140,7 +190,7 @@ const Beautify = () => {
                             <div className="flex-1 py-2">
                                 <Editor
                                     height="100%"
-                                    defaultLanguage="typescript"
+                                    language={selectedLang.monaco}
                                     value={resultCode}
                                     options={{
                                         fontSize: 14,
