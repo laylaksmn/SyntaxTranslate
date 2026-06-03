@@ -1,26 +1,55 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Code2, ArrowLeftRight, Wand2, Languages, X, Copy, ChevronDown } from "lucide-react";
-import { Editor } from "@monaco-editor/react";
+import {
+    Code2,
+    ArrowLeftRight,
+    Wand2,
+    Trash2,
+    Copy,
+    ChevronDown,
+    Languages,
+} from "lucide-react";
 import "../css/app.css";
 
-const LANGUAGES = [
-    { label: "PHP", value: "php", monaco: "php" },
-    { label: "Python", value: "python", monaco: "python" },
+const languages = [
+    { value: "php", label: "PHP" },
+    { value: "python", label: "Python" },
 ];
+
+function SelectLang({ value, onChange }) {
+    return (
+        <div className="relative">
+            <select
+                className="appearance-none bg-white border-[1.5px] border-slate-300 rounded-full pl-5 pr-10 py-1.5 text-[13px] font-bold text-slate-900 shadow-sm hover:bg-slate-50 transition-colors outline-none cursor-pointer"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+            >
+                {languages.map((lang) => (
+                    <option key={lang.value} value={lang.value}>
+                        {lang.label}
+                    </option>
+                ))}
+            </select>
+            <ChevronDown
+                size={14}
+                strokeWidth={3}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-900 pointer-events-none"
+            />
+        </div>
+    );
+}
+
+async function handleCopy(code) {
+    if (!code) return;
+    await navigator.clipboard.writeText(code);
+}
 
 const Beautify = () => {
     const [sourceCode, setSourceCode] = useState("");
     const [resultCode, setResultCode] = useState("");
-    const [selectedLang, setSelectedLang] = useState(LANGUAGES[0]);
+    const [selectedLang, setSelectedLang] = useState("php");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [langOpen, setLangOpen] = useState(false);
-
-    const handleCopy = async (code) => {
-        if (!code) return;
-        await navigator.clipboard.writeText(code);
-    };
 
     const handleBeautify = async () => {
         if (!sourceCode.trim()) return;
@@ -34,7 +63,7 @@ const Beautify = () => {
                 },
                 body: JSON.stringify({
                     code: sourceCode,
-                    lang: selectedLang.value,
+                    lang: selectedLang,
                 }),
             });
             if (res.ok) {
@@ -120,33 +149,6 @@ const Beautify = () => {
                         </button>
                     </div>
 
-                    {/* Language Selector */}
-                    <div className="flex items-center gap-3 mb-5">
-                        <span className="text-xs font-bold text-slate-500 tracking-widest">LANGUAGE</span>
-                        <div className="relative">
-                            <button
-                                onClick={() => setLangOpen(!langOpen)}
-                                className="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-5 py-2 font-bold text-sm text-slate-800 shadow-sm hover:border-blue-400 transition-all"
-                            >
-                                {selectedLang.label}
-                                <ChevronDown size={14} className={`transition-transform ${langOpen ? "rotate-180" : ""}`} />
-                            </button>
-                            {langOpen && (
-                                <div className="absolute top-full left-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-lg z-20 overflow-hidden min-w-[120px]">
-                                    {LANGUAGES.map((lang) => (
-                                        <button
-                                            key={lang.value}
-                                            onClick={() => { setSelectedLang(lang); setLangOpen(false); }}
-                                            className={`w-full text-left px-5 py-3 text-sm font-bold transition-colors hover:bg-blue-50 hover:text-blue-600 ${selectedLang.value === lang.value ? "text-blue-600 bg-blue-50" : "text-slate-700"}`}
-                                        >
-                                            {lang.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
                     {error && (
                         <div className="mb-4 px-5 py-3 bg-red-50 border border-red-200 text-red-600 rounded-2xl text-sm font-semibold">
                             {error}
@@ -154,80 +156,79 @@ const Beautify = () => {
                     )}
 
                     <div className="flex flex-1 gap-6">
-                        {/* Input Block */}
-                        <div className="flex-1 bg-white rounded-[2rem] p-2 flex flex-col border border-slate-200/60 shadow-sm overflow-hidden min-h-[500px]">
-                            <div className="flex justify-between items-center mb-2 px-4 py-3 border-b border-slate-100">
-                                <span className="text-[13px] font-bold text-slate-800">
-                                    SOURCE_CODE
-                                </span>
+                        {/* Source Code Block */}
+                        <div className="flex-1 bg-[#f4f5f7] rounded-[2rem] p-5 flex flex-col border border-slate-200/60 shadow-sm">
+                            <div className="flex justify-between items-center mb-4 px-3 mt-1">
                                 <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-bold text-slate-500 border border-slate-200 rounded-full px-3 py-1">
-                                        {selectedLang.label.toUpperCase()}
+                                    <span className="text-[11px] font-bold text-slate-600 tracking-widest">
+                                        SOURCE_CODE
                                     </span>
+                                    <SelectLang
+                                        value={selectedLang}
+                                        onChange={setSelectedLang}
+                                    />
+                                </div>
+                                <div className="flex gap-4 text-slate-500">
                                     <button
                                         onClick={() => setSourceCode("")}
-                                        className="text-slate-400 hover:text-slate-800 transition-colors"
+                                        className="hover:text-slate-900 transition-colors cursor-pointer"
                                     >
-                                        <X size={16} />
+                                        <Trash2 size={18} />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="flex-1 py-2">
-                                <Editor
-                                    height="100%"
-                                    language={selectedLang.monaco}
-                                    value={sourceCode}
-                                    onChange={(value) => setSourceCode(value)}
-                                    options={{
-                                        fontSize: 14,
-                                        fontFamily: "var(--font-sans), monospace",
-                                        minimap: { enabled: false },
-                                        lineNumbersMinChars: 3,
-                                        scrollBeyondLastLine: false,
-                                        roundedSelection: false,
-                                        padding: { top: 16 },
-                                        renderLineHighlight: "none",
-                                    }}
-                                />
+                            <textarea
+                                className="w-full flex-1 bg-white rounded-[1.5rem] p-6 font-mono text-[13px] leading-[1.8] text-slate-700 shadow-sm min-h-[400px] outline-none border-none resize-none focus:ring-2 focus:ring-blue-100"
+                                value={sourceCode}
+                                onChange={(e) => setSourceCode(e.target.value)}
+                                placeholder="Tulis atau tempel kode di sini..."
+                            />
+
+                            <div className="flex justify-between items-center mt-5 px-3 mb-1 text-[10px] font-bold text-slate-500 tracking-widest">
+                                <span>{selectedLang.toUpperCase()}</span>
+                                <span>CHARS: {sourceCode.length}</span>
                             </div>
                         </div>
 
-                        {/* Output Block */}
-                        <div className="flex-1 bg-white rounded-[2rem] p-2 flex flex-col border border-slate-200/60 shadow-sm overflow-hidden min-h-[500px]">
-                            <div className="flex justify-between items-center mb-2 px-4 py-3 border-b border-slate-100">
-                                <span className="text-[13px] font-bold text-slate-800">
-                                    BEAUTIFIED_CODE
-                                </span>
+                        {/* Beautified Code Block */}
+                        <div className="flex-1 bg-[#f4f5f7] rounded-[2rem] p-5 flex flex-col border border-slate-200/60 shadow-sm">
+                            <div className="flex justify-between items-center mb-4 px-3">
                                 <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-bold text-slate-500 border border-slate-200 rounded-full px-3 py-1">
-                                        {selectedLang.label.toUpperCase()}
+                                    <span className="text-[11px] font-bold text-slate-600 tracking-widest">
+                                        BEAUTIFIED_CODE
                                     </span>
+                                    <span className="text-[11px] font-bold text-slate-400 tracking-widest border border-slate-300 rounded-full px-3 py-1">
+                                        {selectedLang.toUpperCase()}
+                                    </span>
+                                </div>
+                                <div className="flex gap-4 text-slate-500">
                                     <button
                                         onClick={() => handleCopy(resultCode)}
-                                        className="text-slate-400 hover:text-slate-800 transition-colors"
+                                        className="hover:text-slate-900 transition-colors cursor-pointer"
                                     >
-                                        <Copy size={16} />
+                                        <Copy size={18} />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="flex-1 py-2">
-                                <Editor
-                                    height="100%"
-                                    language={selectedLang.monaco}
-                                    value={resultCode}
-                                    options={{
-                                        fontSize: 14,
-                                        fontFamily: "var(--font-sans), monospace",
-                                        minimap: { enabled: false },
-                                        lineNumbersMinChars: 3,
-                                        readOnly: true,
-                                        scrollBeyondLastLine: false,
-                                        padding: { top: 16 },
-                                        renderLineHighlight: "none",
-                                    }}
-                                />
+                            <textarea
+                                className="w-full flex-1 bg-white rounded-[1.5rem] p-6 font-mono text-[13px] leading-relaxed shadow-sm min-h-[400px] outline-none border-none resize-none"
+                                value={resultCode}
+                                readOnly
+                                placeholder="Hasil beautify akan muncul di sini..."
+                            />
+
+                            <div className="flex justify-between items-center mt-5 px-3 mb-1 text-[10px] font-bold tracking-widest">
+                                <span className="text-slate-500">
+                                    {selectedLang.toUpperCase()}
+                                </span>
+                                {resultCode && (
+                                    <span className="flex items-center gap-1.5 text-emerald-600">
+                                        <span className="text-[9px]">●</span>{" "}
+                                        BEAUTIFIED_SUCCESSFULLY
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>
