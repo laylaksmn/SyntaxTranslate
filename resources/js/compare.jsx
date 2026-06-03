@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Code2, ArrowLeftRight, Wand2, Languages, X, Copy } from "lucide-react";
+import { Code2, ArrowLeftRight, Wand2, Trash2, Languages } from 'lucide-react';
 import { Editor, DiffEditor } from "@monaco-editor/react";
 import "../css/app.css";
 
@@ -8,6 +8,15 @@ function Compare() {
     const [firstCode, setFirstCode] = useState("");
     const [secondCode, setSecondCode] = useState("");
     const [showDiff, setShowDiff] = useState(false);
+
+    const PLACEHOLDER_LEFT = "Tulis atau tempel kode di sini...";
+    const PLACEHOLDER_RIGHT = "Tulis atau tempel kode di sini...";
+
+    const handleDelete = () => {
+        setFirstCode("");
+        setSecondCode("");
+        setShowDiff(false);
+    };
 
     const isCodeLike = (text) => {
         const syntaxPattern =
@@ -98,7 +107,7 @@ function Compare() {
                     </div>
 
                     {!showDiff ? (
-                        <div className="flex flex-1 gap-6">
+                        <div key={`input-mode-${showDiff}`} className="flex flex-1 gap-6">
                             {/* Input Block 1 */}
                             <div className="flex-1 bg-white rounded-[2rem] p-2 flex flex-col border border-slate-200/60 shadow-sm overflow-hidden min-h-[500px]">
                                 <div className="flex justify-between items-center mb-2 px-4 py-3 border-b border-slate-100">
@@ -106,25 +115,23 @@ function Compare() {
                                         SOURCE_CODE
                                     </span>
                                     <div className="flex items-center gap-3">
-                                        <button
-                                            onClick={() => setFirstCode("")}
-                                            className="text-slate-400 hover:text-slate-800 transition-colors cursor-pointer"
-                                        ></button>
+                                        <button onClick={() => setFirstCode("")} className="hover:text-slate-900 transition-colors cursor-pointer"><Trash2 size={18} /></button>
                                     </div>
                                 </div>
 
-                                <div className="flex-1 py-2">
+                                <div className="flex-1 py-2 relative">
+                                    {!firstCode && (
+                                        <div className="absolute top-4 left-12 right-4 text-slate-400 font-mono text-sm pointer-events-none select-none z-10">
+                                            {PLACEHOLDER_LEFT}
+                                        </div>
+                                    )}
                                     <Editor
                                         height="100%"
-                                        defaultLanguage="typescript"
                                         value={firstCode}
-                                        onChange={(value) =>
-                                            setFirstCode(value)
-                                        }
+                                        onChange={(value) => setFirstCode(value || "")}
                                         options={{
                                             fontSize: 14,
-                                            fontFamily:
-                                                "var(--font-sans), monospace",
+                                            fontFamily: "var(--font-sans), monospace",
                                             minimap: { enabled: false },
                                             lineNumbersMinChars: 3,
                                             scrollBeyondLastLine: false,
@@ -143,27 +150,23 @@ function Compare() {
                                         MODIFIED_CODE
                                     </span>
                                     <div className="flex items-center gap-3">
-                                        <button
-                                            onClick={() =>
-                                                handleCopy(secondCode)
-                                            }
-                                            className="text-slate-400 hover:text-slate-800 transition-colors cursor-pointer"
-                                        ></button>
+                                        <button onClick={() => setSecondCode("")} className="hover:text-slate-900 transition-colors cursor-pointer"><Trash2 size={18} /></button>
                                     </div>
                                 </div>
 
-                                <div className="flex-1 py-2">
+                                <div className="flex-1 py-2 relative">
+                                    {!secondCode && (
+                                        <div className="absolute top-4 left-12 right-4 text-slate-400 font-mono text-sm pointer-events-none select-none z-10">
+                                            {PLACEHOLDER_RIGHT}
+                                        </div>
+                                    )}
                                     <Editor
                                         height="100%"
-                                        defaultLanguage="typescript"
                                         value={secondCode}
-                                        onChange={(value) =>
-                                            setSecondCode(value)
-                                        }
+                                        onChange={(value) => setSecondCode(value || "")}
                                         options={{
                                             fontSize: 14,
-                                            fontFamily:
-                                                "var(--font-sans), monospace",
+                                            fontFamily: "var(--font-sans), monospace",
                                             minimap: { enabled: false },
                                             lineNumbersMinChars: 3,
                                             scrollBeyondLastLine: false,
@@ -175,40 +178,52 @@ function Compare() {
                                 </div>
                             </div>
                         </div>
+
                     ) : (
-                        <div className="flex-1 bg-white rounded-[2rem] p-2 flex flex-col border border-slate-200/60 shadow-sm overflow-hidden min-h-[500px]">
-                            <div className="flex justify-between items-center mb-2 px-4 py-3 border-b border-slate-100">
-                                <span className="text-[13px] font-bold text-slate-800">
-                                    CODE_DIFFERENCE
-                                </span>
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-bold text-slate-500 border border-slate-200 rounded-full px-3 py-1">
-                                        COMPARISON
-                                    </span>
-                                    <button
-                                        onClick={() => setShowDiff(false)}
-                                        className="text-slate-400 hover:text-slate-800 transition-colors cursor-pointer"
-                                        title="Back to Editor"
-                                    >
-                                        <X size={16} />
-                                    </button>
+
+                        <div className="flex-1 flex gap-6 w-full rounded-[2rem] overflow-hidden">
+                            <div className="w-full bg-white border border-slate-200/60 shadow-sm p-4 rounded-[2rem] flex flex-col">
+                                <div className="flex gap-6 mb-4 pb-3 border-b border-slate-100 w-full">
+                                    <div className="flex-1 flex justify-between items-center px-2">
+                                        <span className="text-[13px] font-bold text-slate-800">SOURCE_CODE</span>
+                                        <button 
+                                            onClick={() => { setFirstCode(""); setShowDiff(false); }}  
+                                            className="text-slate-400 hover:text-slate-900 transition-colors cursor-pointer"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
+
+                                    <div className="flex-1 flex justify-between items-center px-2">
+                                        <span className="text-[13px] font-bold text-slate-800">MODIFIED_CODE</span>
+                                        <button 
+                                            onClick={() => { setSecondCode(""); setShowDiff(false);}} 
+                                            className="text-slate-400 hover:text-slate-900 transition-colors cursor-pointer"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex-1 py-2">
-                                <DiffEditor
-                                    height="100%"
-                                    original={firstCode}
-                                    modified={secondCode}
-                                    options={{
-                                        fontSize: 14,
-                                        fontFamily:
-                                            "var(--font-sans), monospace",
-                                        minimap: { enabled: false },
-                                        lineNumbersMinChars: 3,
-                                        scrollBeyondLastLine: false,
-                                        padding: { top: 16 },
-                                    }}
-                                />
+                                                                            
+                                <div className="flex-1 min-h-[450px]">
+                                    <DiffEditor
+                                        height="100%"
+                                        original={firstCode}
+                                        modified={secondCode}
+                                        options={{
+                                            fontSize: 14,
+                                            fontFamily: "var(--font-sans), monospace",
+                                            minimap: { enabled: false },
+                                            lineNumbersMinChars: 3,
+                                            scrollBeyondLastLine: false,
+                                            renderSideBySide: true,
+                                            originalEditable: false,
+                                            readOnly: false,
+                                            domReadOnly: false,
+                                            padding: { top: 8 }
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
                     )}
