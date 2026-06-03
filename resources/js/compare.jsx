@@ -40,7 +40,7 @@ function Compare() {
             <div className="flex flex-1 gap-6 relative">
                 {/* Sidebar */}
                 <div className="w-[280px] flex flex-col h-full sticky top-6">
-                    <aside className="bg-white rounded-[2rem] border border-slate-200 p-6 flex flex-col shadow-sm h-full min-h-[500px]">
+                    <aside className="bg-white rounded-[2rem] border border-slate-200 p-6 flex flex-col shadow-sm h-full min-h-[800px]">
                         <div>
                             <h2 className="text-xs font-bold text-slate-800 mb-6 tracking-widest pl-2">
                                 WORKSPACE

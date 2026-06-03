@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Code2, ArrowLeftRight, Wand2, Languages, X, Copy, ChevronDown } from "lucide-react";
+import {
+    Code2,
+    ArrowLeftRight,
+    Wand2,
+    Languages,
+    X,
+    Copy,
+    ChevronDown,
+} from "lucide-react";
 import { Editor } from "@monaco-editor/react";
 import "../css/app.css";
 
@@ -42,7 +50,9 @@ const Beautify = () => {
                 setResultCode(data.result);
             } else {
                 const data = await res.json().catch(() => ({}));
-                setError(data.error || "Something went wrong. Please try again.");
+                setError(
+                    data.error || "Something went wrong. Please try again.",
+                );
                 setResultCode("");
             }
         } catch (e) {
@@ -70,7 +80,7 @@ const Beautify = () => {
             <div className="flex flex-1 gap-6 relative">
                 {/* Sidebar */}
                 <div className="w-[280px] flex flex-col h-full sticky top-6">
-                    <aside className="bg-white rounded-[2rem] border border-slate-200 p-6 flex flex-col shadow-sm h-full min-h-[500px]">
+                    <aside className="bg-white rounded-[2rem] border border-slate-200 p-6 flex flex-col shadow-sm h-full min-h-[800px]">
                         <div>
                             <h2 className="text-xs font-bold text-slate-800 mb-6 tracking-widest pl-2">
                                 WORKSPACE
@@ -81,18 +91,24 @@ const Beautify = () => {
                                     className="flex items-center gap-4 text-slate-500 hover:bg-slate-50 px-5 py-3.5 rounded-[1.25rem] font-bold transition-all hover:text-slate-800"
                                 >
                                     <Languages size={22} />
-                                    <span className="text-[13px] tracking-wide">TRANSLATE</span>
+                                    <span className="text-[13px] tracking-wide">
+                                        TRANSLATE
+                                    </span>
                                 </a>
                                 <a
                                     href="/compare"
                                     className="flex items-center gap-4 text-slate-500 hover:bg-slate-50 px-5 py-3.5 rounded-[1.25rem] font-bold transition-all hover:text-slate-800"
                                 >
                                     <ArrowLeftRight size={22} />
-                                    <span className="text-[13px] tracking-wide">COMPARE</span>
+                                    <span className="text-[13px] tracking-wide">
+                                        COMPARE
+                                    </span>
                                 </a>
                                 <button className="flex items-center gap-4 bg-[#3b82f6] text-white px-5 py-3.5 rounded-[1.25rem] font-bold shadow-[0_8px_20px_-6px_rgba(59,130,246,0.6)] transition-all active:scale-95">
                                     <Wand2 size={22} />
-                                    <span className="text-[13px] tracking-wide">BEAUTIFY</span>
+                                    <span className="text-[13px] tracking-wide">
+                                        BEAUTIFY
+                                    </span>
                                 </button>
                             </nav>
                         </div>
@@ -122,21 +138,29 @@ const Beautify = () => {
 
                     {/* Language Selector */}
                     <div className="flex items-center gap-3 mb-5">
-                        <span className="text-xs font-bold text-slate-500 tracking-widest">LANGUAGE</span>
+                        <span className="text-xs font-bold text-slate-500 tracking-widest">
+                            LANGUAGE
+                        </span>
                         <div className="relative">
                             <button
                                 onClick={() => setLangOpen(!langOpen)}
                                 className="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-5 py-2 font-bold text-sm text-slate-800 shadow-sm hover:border-blue-400 transition-all"
                             >
                                 {selectedLang.label}
-                                <ChevronDown size={14} className={`transition-transform ${langOpen ? "rotate-180" : ""}`} />
+                                <ChevronDown
+                                    size={14}
+                                    className={`transition-transform ${langOpen ? "rotate-180" : ""}`}
+                                />
                             </button>
                             {langOpen && (
                                 <div className="absolute top-full left-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-lg z-20 overflow-hidden min-w-[120px]">
                                     {LANGUAGES.map((lang) => (
                                         <button
                                             key={lang.value}
-                                            onClick={() => { setSelectedLang(lang); setLangOpen(false); }}
+                                            onClick={() => {
+                                                setSelectedLang(lang);
+                                                setLangOpen(false);
+                                            }}
                                             className={`w-full text-left px-5 py-3 text-sm font-bold transition-colors hover:bg-blue-50 hover:text-blue-600 ${selectedLang.value === lang.value ? "text-blue-600 bg-blue-50" : "text-slate-700"}`}
                                         >
                                             {lang.label}
@@ -167,9 +191,7 @@ const Beautify = () => {
                                     <button
                                         onClick={() => setSourceCode("")}
                                         className="text-slate-400 hover:text-slate-800 transition-colors"
-                                    >
-                                        <X size={16} />
-                                    </button>
+                                    ></button>
                                 </div>
                             </div>
 
@@ -181,7 +203,8 @@ const Beautify = () => {
                                     onChange={(value) => setSourceCode(value)}
                                     options={{
                                         fontSize: 14,
-                                        fontFamily: "var(--font-sans), monospace",
+                                        fontFamily:
+                                            "var(--font-sans), monospace",
                                         minimap: { enabled: false },
                                         lineNumbersMinChars: 3,
                                         scrollBeyondLastLine: false,
@@ -219,7 +242,8 @@ const Beautify = () => {
                                     value={resultCode}
                                     options={{
                                         fontSize: 14,
-                                        fontFamily: "var(--font-sans), monospace",
+                                        fontFamily:
+                                            "var(--font-sans), monospace",
                                         minimap: { enabled: false },
                                         lineNumbersMinChars: 3,
                                         readOnly: true,
